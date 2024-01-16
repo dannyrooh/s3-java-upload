@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dannyrooh.s3upload.infra.AmazonS3Repository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,10 +27,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 @CrossOrigin("*")
 public class UploadController {
     
-
     private final String pathArquivo;
+    private final AmazonS3Repository amazonS3Repository;
 
-     public UploadController(@Value("${app.path.arquivos}") String pathArquivo){
+     public UploadController(
+         @Value("${app.path.arquivos}") String pathArquivo,
+         AmazonS3Repository amazonS3Repository){
+
+        this.amazonS3Repository = amazonS3Repository;
         
         this.pathArquivo = pathArquivo;
 
@@ -40,14 +45,21 @@ public class UploadController {
     public ResponseEntity<String> salvarArquivo(@RequestParam("file") MultipartFile file) {
          log.info("Recebendo o arquvo: " + file.getOriginalFilename());
 
-         
-         var caminho = pathArquivo + UUID.randomUUID() + "." + extrairExtensao(file.getOriginalFilename());
+
+         var fileName = UUID.randomUUID() + "." + extrairExtensao(file.getOriginalFilename());
+         var caminho = pathArquivo + fileName ;
         
          log.info("Novo nome do arquivo " + caminho);
 
          try {
 
+            log.info("Grava localmente o arquivo: " + caminho);
             Files.copy(file.getInputStream(), Path.of(caminho), StandardCopyOption.REPLACE_EXISTING);
+
+            var fileS3 = "tmp/"+fileName;
+            log.info("Grava no S3 o arquivo: " + fileS3);
+
+            this.amazonS3Repository.sendFile( fileS3, caminho);
 
             return new ResponseEntity<>("{\"mensagem\":\"Arquivo carregado com sucesso!\"}", HttpStatus.OK);
             
@@ -59,6 +71,33 @@ public class UploadController {
             
          }
     }
+
+    @PostMapping("/s3")
+    public ResponseEntity<String> salvarArquivoS3(@RequestParam("file") MultipartFile file) {
+         log.info("Recebendo o arquvo: " + file.getOriginalFilename());
+
+
+         var fileName = UUID.randomUUID() + "." + extrairExtensao(file.getOriginalFilename());
+
+         try {
+
+            var fileS3 = "tmp/"+fileName;
+            log.info("Grava no S3 o arquivo: " + fileS3);
+
+            this.amazonS3Repository.sendStream(fileS3, file.getInputStream());
+
+            return new ResponseEntity<>("{\"mensagem\":\"Arquivo carregado com sucesso no S3!\"}", HttpStatus.OK);
+            
+         } catch (Exception e) {
+
+            log.error("Erro ao processar o arquivo", e);
+
+            return new ResponseEntity<>("{\"mensagem\":\"Erro ao carregar o arquivo!\"}", HttpStatus.OK);
+            
+         }
+    }
+
+
 
     private String extrairExtensao(String originalFilename) {
         
