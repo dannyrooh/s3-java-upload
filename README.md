@@ -1,5 +1,7 @@
 # s3-java-upload
-Exemplo para fazer upload de arquivos num bucket S3
+Exemplo para fazer upload de arquivos.
+Criar endpoint para fazer upload local e para um bucket s3
+
 
 
 ## Requisitos
