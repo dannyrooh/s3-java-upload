@@ -14,6 +14,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
+
 @Component
 public class AmazonS3Repository {
 
@@ -57,6 +58,7 @@ public class AmazonS3Repository {
                     fos.write(buffer, 0, bytesRead);
                 }
             }
+
 
             clientS3.putObject(this.bucket, destinyFile, tempFile);
 
