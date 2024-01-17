@@ -1,8 +1,10 @@
-package com.dannyrooh.s3upload.entrypoint;
+package com.dannyrooh.s3upload.ged.entrypoint;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dannyrooh.s3upload.infra.AmazonS3Repository;
+import com.dannyrooh.s3upload.ged.domain.util.UtilCheckSum256;
+import com.dannyrooh.s3upload.ged.infra.AmazonS3Repository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,7 +76,7 @@ public class UploadController {
     }
 
     @PostMapping("/s3")
-    public ResponseEntity<String> salvarArquivoS3(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> salvarArquivoS3(@RequestParam("file") MultipartFile file) {
          log.info("Recebendo o arquvo: " + file.getOriginalFilename());
 
 
@@ -86,13 +89,20 @@ public class UploadController {
 
             this.amazonS3Repository.sendStream(fileS3, file.getInputStream());
 
-            return new ResponseEntity<>("{\"mensagem\":\"Arquivo carregado com sucesso no S3!\"}", HttpStatus.OK);
+            var checkSum = UtilCheckSum256.exec(file.getInputStream());
+
+            var response = new HashMap<String, String>();
+            response.put("checkSum", checkSum);
+            response.put("mensagem", "Arquivo carregado com sucesso no S#");
+                    
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
             
          } catch (Exception e) {
 
             log.error("Erro ao processar o arquivo", e);
 
-            return new ResponseEntity<>("{\"mensagem\":\"Erro ao carregar o arquivo!\"}", HttpStatus.OK);
+            return new ResponseEntity<>(Map.of("mensagem", "Erro ao carregar o arquivo"), HttpStatus.INTERNAL_SERVER_ERROR);
             
          }
     }

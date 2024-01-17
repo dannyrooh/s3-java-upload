@@ -1,4 +1,4 @@
-package com.dannyrooh.s3upload.infra;
+package com.dannyrooh.s3upload.ged.infra;
 
 import java.io.File;
 import java.io.FileOutputStream;
