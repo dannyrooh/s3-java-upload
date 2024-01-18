@@ -1,6 +1,5 @@
-package com.dannyrooh.s3upload.documento.domain.usecase.request;
+package com.dannyrooh.s3upload.documento.domain.entity;
 
-import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,17 +10,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CadastraDocumentoRequest {
+public class DocumentoUpload {
 
-
-    @NotNull
     private String nome;
 
     private String extensao;
 
-    @NotNull
     private String caminho;
 
     private String checksum;
-
 }

@@ -1,4 +1,4 @@
-package com.dannyrooh.s3upload.ged.infra;
+package com.dannyrooh.s3upload.documento.infra.storage;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -58,7 +58,6 @@ public class AmazonS3Repository {
                     fos.write(buffer, 0, bytesRead);
                 }
             }
-
 
             clientS3.putObject(this.bucket, destinyFile, tempFile);
 

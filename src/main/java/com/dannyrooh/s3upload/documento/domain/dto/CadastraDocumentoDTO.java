@@ -13,7 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CadastraDocumentoDTO {
 
-    @NotNull
     private Integer id;
 
     @NotNull

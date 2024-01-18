@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dannyrooh.s3upload.ged.domain.util.UtilCheckSum256;
-import com.dannyrooh.s3upload.ged.infra.AmazonS3Repository;
+import com.dannyrooh.s3upload.documento.infra.storage.AmazonS3Repository;
+import com.dannyrooh.s3upload.util.UtilCheckSum256;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,7 +46,7 @@ public class UploadController {
 
     @PostMapping("/arquivo")
     public ResponseEntity<String> salvarArquivo(@RequestParam("file") MultipartFile file) {
-         log.info("Recebendo o arquvo: " + file.getOriginalFilename());
+         log.info("Recebendo o arquivo: " + file.getOriginalFilename());
 
 
          var fileName = UUID.randomUUID() + "." + extrairExtensao(file.getOriginalFilename());

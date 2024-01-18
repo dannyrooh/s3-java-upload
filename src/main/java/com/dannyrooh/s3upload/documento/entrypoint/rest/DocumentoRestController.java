@@ -11,13 +11,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.dannyrooh.s3upload.documento.domain.usecase.AtualizaDocumentoUseCase;
 import com.dannyrooh.s3upload.documento.domain.usecase.CadastraDocumentoUseCase;
 import com.dannyrooh.s3upload.documento.domain.usecase.ConsultaDocumentoPorIdUseCase;
 import com.dannyrooh.s3upload.documento.domain.usecase.ConsultaDocumentoUseCase;
 import com.dannyrooh.s3upload.documento.domain.usecase.ExcluiDocumentoPorIdUseCase;
+import com.dannyrooh.s3upload.documento.domain.usecase.UploadDocumentoStreamUseCase;
 import com.dannyrooh.s3upload.documento.domain.usecase.request.AtualizaDocumentoRequest;
 import com.dannyrooh.s3upload.documento.domain.usecase.request.CadastraDocumentoRequest;
 import com.dannyrooh.s3upload.documento.domain.usecase.response.CadastraDocumentoResponse;
@@ -42,17 +45,20 @@ public class DocumentoRestController {
     private final ConsultaDocumentoUseCase usecase_busca;
     private final ConsultaDocumentoPorIdUseCase usecase_buscaporid;
     private final ExcluiDocumentoPorIdUseCase usecase_delete;
+    private final UploadDocumentoStreamUseCase usecase_upload;
 
     public DocumentoRestController(final CadastraDocumentoUseCase usecase_cadastra,
                               final AtualizaDocumentoUseCase usecase_atualiza,
                               final ConsultaDocumentoUseCase usecase_busca,
                               final ConsultaDocumentoPorIdUseCase usecase_buscaporid,
-                              final ExcluiDocumentoPorIdUseCase usecase_delete) {
+                              final ExcluiDocumentoPorIdUseCase usecase_delete,
+                              final UploadDocumentoStreamUseCase usecase_upload) {
         this.usecase_cadastra = usecase_cadastra;
         this.usecase_atualiza = usecase_atualiza;
         this.usecase_busca = usecase_busca;
         this.usecase_buscaporid = usecase_buscaporid;
         this.usecase_delete = usecase_delete;
+        this.usecase_upload = usecase_upload;
     }
 
     @Operation(summary = "Cadastro de documento", method = "POST")
@@ -114,4 +120,19 @@ public class DocumentoRestController {
         return ResponseEntity.noContent().build();
 
     }
+
+
+
+    @Operation(summary = "Faz o upload de um documento e realiza o cadastro na tabela documento", method = "POST")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Documento cadastrado com sucesso", content = {
+            @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CadastraDocumentoResponse.class)) }),
+        @ApiResponse(responseCode = "422", description = "Erro de negócio ao cadastrar o documento", content = @Content) })      
+    @PostMapping("/upload")
+    public ResponseEntity<Object> salvarArquivo(@RequestParam("file") MultipartFile file) {
+        
+        return ResponseEntity.ok(usecase_upload.upload(file));
+        
+    }
+
 }

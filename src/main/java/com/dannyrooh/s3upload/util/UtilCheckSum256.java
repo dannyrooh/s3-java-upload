@@ -1,4 +1,4 @@
-package com.dannyrooh.s3upload.ged.domain.util;
+package com.dannyrooh.s3upload.util;
 
 import java.io.InputStream;
 import java.security.DigestInputStream;
@@ -8,14 +8,17 @@ import java.security.NoSuchAlgorithmException;
 public class UtilCheckSum256 {
 
     public static String exec(InputStream inputStream) throws NoSuchAlgorithmException {
-        
-        byte[] sha256Hash = calculateSHA256(inputStream);
-        return bytesToHex(sha256Hash);
+
+        byte[]  sha256Hash = calculateSHA256(inputStream);
+
+        return bytesToHex(sha256Hash);    
 
     }
 
     private static byte[] calculateSHA256(InputStream inputStream) throws NoSuchAlgorithmException {
+
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
         byte[] buffer = new byte[8192];
         
         try (DigestInputStream digestInputStream = new DigestInputStream(inputStream, digest)) {
@@ -30,7 +33,9 @@ public class UtilCheckSum256 {
     }
 
     private static String bytesToHex(byte[] hash) {
+
         StringBuilder hexString = new StringBuilder(2 * hash.length);
+
         for (byte b : hash) {
             String hex = Integer.toHexString(0xff & b);
             if (hex.length() == 1) {
@@ -38,6 +43,7 @@ public class UtilCheckSum256 {
             }
             hexString.append(hex);
         }
+        
         return hexString.toString();
     }
 
